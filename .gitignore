@@ -1,0 +1,14 @@
+INSTALL
+Makefile
+Makefile.in
+aclocal.m4
+autom4te.cache/
+autotools/install-sh
+autotools/missing
+bash_include.pc
+config.log
+config.status
+config.transform
+configure
+etc/env.d/05bash_include
+src/bash_include
