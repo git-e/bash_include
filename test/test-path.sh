@@ -143,8 +143,9 @@ test_simplify_prepends_dot_dot_slash_if_path_leaves_origin() {
 	assert that path_simplify "x/../.." writes ".."
 	assert that path_simplify "x/../../b/../../c" writes "../../c"
 }
-test_simplify_does_not_prepend_dot_dot_slash_if_path_is_at_root() {
+test_simplify_does_not_leave_root() {
 	assert that path_simplify "/test/../.." writes "/"
+	assert that path_simplify "/a/../../../a/b" writes "/a/b"
 }
 test_simplify_writes_slash_if_path_returns_to_root() {
 	assert that path_simplify "/test/.." writes "/"

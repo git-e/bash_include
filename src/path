@@ -50,12 +50,18 @@ path_simplify() (
 			*) simplePath=( "${simplePath[@]::${#simplePath[@]}-1}" ) ;;
 			esac
 		;;
-		'') simplePath=( "${simplePath[@]-}" ) ;;
+		'') ;; # simplePath=( "${simplePath[@]-}" ) ;;
 		*) simplePath+=( "${pathPart}" ) ;;
 		esac
 	done
-	path="${simplePath[*]-.}"
-	printf '%s\n' "${path:-/}"
+	if [ "/" == "${path:0:1}" ]; then
+		while [ ".." == "${simplePath[0]}" ]; do
+			simplePath=( "${simplePath[@]:1}" )
+		done
+		printf '/%s\n' "${simplePath[*]}"
+	else
+		printf '%s\n' "${simplePath[*]-.}"
+	fi
 )
 
 # path_make_absolute: write an absolute path to stdout.
