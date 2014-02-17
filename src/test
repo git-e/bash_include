@@ -10,8 +10,8 @@ SCRIPT_API="0"
 
 testcase_begin() {
 	local IFS=$'\n'
-	_test_unsetTestFunctions
 	_test_resetTestCaseVariables
+	_test_setupTestStage
 }
 
 testcase_end() {
@@ -35,7 +35,7 @@ _test_exit_on_error() {
 	exit 1
 } 2>&1
 
-_test_unsetTestFunctions() {
+_test_setupTestStage() {
 	local IFS=$'\n'
 	for line in $(declare -p -F); do
 		local function="${line#declare -f }"
@@ -44,6 +44,10 @@ _test_unsetTestFunctions() {
 	done
 	unset _test_data
 	declare -gA _test_data
+	# this function is called before each test, overwrite to implement setup
+	teststage_setup() {
+		:
+	}
 }
 
 _test_resetTestCaseVariables() {
@@ -68,14 +72,13 @@ _test_runTestFunctions() {
 		local function="${line#declare -f }"
 		test "test_" == "${function::5}" || continue
 		while read -r _test_dataline; do
-			IFS=$'\t\n '
-			eval _test_dataset=( $_test_dataline )
+			IFS=$'\t\n ' eval _test_dataset=( ${_test_dataline} )
 			(( ++_test_runCount ))
 			if (( _test_stageFailed )); then
 				(( ++_test_skippedCount ))
 				printf '%s %s.\n' "${function:5}" "${_test_SKIPPED}"
 			else
-				IFS="$_test_IFS" _test_runTest "$function" "${_test_dataset[@]}"
+				IFS="$_test_IFS" _test_runTest "${_test_dataline}" "$function" "${_test_dataset[@]}"
 			fi
 		done <<< "${_test_data[${function:5}]}"
 	done
@@ -84,14 +87,14 @@ _test_runTestFunctions() {
 
 _test_runTest() {
 	local _test_output _test_result _test_status
-	_test_output="$(teststage_setup; 2>&1 "$@")"
+	_test_output="$(teststage_setup; 2>&1 "${@:2}")"
 	_test_result=$?
 	if [ $_test_result == 0 ]; then
 		_test_status="${_test_PASSED}"
 	else
 		_test_status="${_test_FAILED}"
 	fi
-	IFS=' ' printf '%s %s' "${1#test_}${2:+(${*:2})}" "${_test_status}"
+	IFS=' ' printf '%s %s' "${2#test_}${1:+($1)}" "${_test_status}"
 	if [ -n "${_test_output}" ]; then
 		printf ':\n%s\n' "$(sed 's/^/> /' <<EOF
 ${_test_output}
@@ -112,13 +115,9 @@ EOF
 
 teststage_proceed() {
 	_test_runTestFunctions
-	_test_unsetTestFunctions
+	_test_setupTestStage
 }
 
-# this function is called before each test, overwrite to implement setup
-teststage_setup() {
-	:
-}
 _test_printfAndFail() {
 	 1>&2 printf "$@"
 	exit 1

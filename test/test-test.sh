@@ -7,7 +7,7 @@ test_runTest() {
 
 teststage_proceed
 test_testFails() {
-	_test_runTest false
+	_test_runTest "" false
 	test $? != 0
 }
 
@@ -55,8 +55,8 @@ test_z_test_function_is_called_once_for_each_line_in_test_data() {
 	fi
 }
 testdata "testdata_is_passed_to_test_function" <<-EOF
-	1 a
-	2 b
+	1 "a"
+	2 "b"
 EOF
 
 teststage_proceed
