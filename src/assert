@@ -20,6 +20,10 @@ _assert() (
 	that)
 		_assert_that "${@:2}"
 	;;
+	!)
+		"${@:2}"
+		test $? == 1 || _assert_fail
+	;;
 	*)
 		"$@"
 		test $? == 0 || _assert_fail
