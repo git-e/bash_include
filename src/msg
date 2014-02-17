@@ -71,4 +71,13 @@ msg_error() {
 	return "${error}"
 }
 
+msg_error_stacktrace() {
+	for (( i = ${#BASH_SOURCE[@]} - 1; i > 0; --i )); do
+		printf '%s\n\t' "${BASH_SOURCE[i]}:${BASH_LINENO[i-1]}" 1>&2
+	done
+	msg_error "${1//
+/
+	}" "$2"
+}
+
 module_end "${@}"

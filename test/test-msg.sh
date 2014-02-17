@@ -1,6 +1,7 @@
 #!./tester
 #
 include msg
+include str
 include assert
 
 testcase_begin "$@"
@@ -73,6 +74,14 @@ test_msg_error_returns_if_msg_panic_is_false() {
 test_msg_error_returns_2nd_parameter_if_provided() {
 	msg_error "error message" 123 2>&-
 	assertEquals 123 $?
+}
+
+teststage_proceed
+test_msg_error_stacktrace() {
+	message="$(msg_error_stacktrace "message" 123  2>&1 1>/dev/null)"
+	assert str "$message" ends with "\
+	./test-msg.sh:$((LINENO - 1))
+	program: message"
 }
 
 testcase_end "$@"
