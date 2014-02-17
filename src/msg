@@ -71,6 +71,9 @@ msg_error() {
 	return "${error}"
 }
 
+# msg_error_stacktrace: print current stacktrace and a message to stderr. calls exit
+# if msg-panic == true
+# return/exit code is $2 if set, $msg_error_code otherwise
 msg_error_stacktrace() {
 	for (( i = ${#BASH_SOURCE[@]} - 1; i > 0; --i )); do
 		printf '%s\n\t' "${BASH_SOURCE[i]}:${BASH_LINENO[i-1]}" 1>&2
