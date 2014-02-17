@@ -1,5 +1,6 @@
 dist_libentry_SCRIPTS+=\
 	src/BOOL \
+	src/assert \
 	src/basic \
 	src/err \
 	src/math \
