@@ -134,4 +134,35 @@ path_is_relative() {
 		test '/' != "${path::1}"
 }
 
+# path_basename: this is equivalent to basename but avoids forking
+path_basename() {
+	set -- "${@/#/-/}"
+	set -- "${@/#-\/\//--/}"
+	set -- "${@/%//}"
+	set -- "${@//\//-//}"
+	set -- "${@//\/-\//}"
+	set -- "${@%-*}"
+	set -- "${@/#??*\//--}"
+	set -- "${@/#??///}"
+	set -- "${@/#?//}"
+	set -- "${@/%\////}"
+	printf '%s\n' "${*#??}"
+}
+
+path_dirname() {
+	set -- "${@/#/.}"
+	set -- "${@/#.\//:/}"
+	set -- "${@/#././}"
+	set -- "${@/%//}"
+	set -- "${@//\//-//}"
+	set -- "${@//\/-\///}"
+	set -- "${@%-/*}"
+	set -- "${@%-/*}"
+	set -- "${@//-\/\///}"
+	set -- "${@/#:\///}"
+	set -- "${@/#://}"
+	set -- "${@/#.\//}"
+	printf '%s\n' "${*}"
+}
+
 module_end "${@}"

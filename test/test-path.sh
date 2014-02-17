@@ -1,5 +1,6 @@
 #!./tester
 #
+include str
 include path
 include assert
 
@@ -193,4 +194,114 @@ test_make_relative_writes_dot_if_both_parameters_are_identical() {
 test_make_relative_monkey_input() {
 	assert that path_make_relative "$monkey_input" "$monkey_input" writes "."
 }
+
+teststage_proceed
+test_basename() {
+	assert that path_basename "" writes ""
+	assert that path_basename "a" writes "a"
+	assert that path_basename "/a/b/c" writes "c"
+	assert that path_basename "/a//b///c" writes "c"
+	assert that path_basename "/a/b/-" writes "-"
+	assert that path_basename "-" writes "-"
+	assert that path_basename "-/" writes "-"
+	assert that path_basename "/-" writes "-"
+	assert that path_basename "b/-" writes "-"
+	assert that path_basename "/b/-" writes "-"
+	assert that path_basename "a///b///" writes "b"
+	assert that path_basename "///a///b///" writes "b"
+}
+
+test_basename_returns_slash_if_path_consists_only_of_slashes() {
+	assert that path_basename "/" writes "/"
+	assert that path_basename "//" writes "/"
+	assert that path_basename "///" writes "/"
+	assert that path_basename "////" writes "/"
+	assert that path_basename "/////" writes "/"
+}
+
+test_basename_ignores_trailing_slashes() {
+	assert that path_basename "/a/b/c/" writes "c"
+	assert that path_basename "/a/b/c//" writes "c"
+	assert that path_basename "/a/b/c///" writes "c"
+	assert that path_basename "/a/b/c////" writes "c"
+	assert that path_basename "/a/b/c/////" writes "c"
+	assert that path_basename "/a/b/-/" writes "-"
+}
+
+test_basename_accepts_multiple_arguments() {
+	IFS=:
+	assert that path_basename "/a/b/c" "d" "e/f/g/" "/" "" "|" writes "c:d:g:/::|"
+}
+
+
+test_basename_timing() {
+	loop() {
+		for (( i=0; i < 500; ++i )); do
+			"$@" >/dev/null
+		done
+	}
+	run_race() {
+		{
+			{ time loop path_basename "/a/b////c/" ; } 2>&1 | sed -n '/real/ s/$/ 1/p'
+			{ time loop basename "/a/b////c/" ; } 2>&1 | sed -n '/real/ s/$/ 2/p'
+		} | sort | head -n 1 | sed -r 's/.*(.)$/\1/'
+	}
+	assert that run_race writes 1
+}
+
+teststage_proceed
+test_dirname() {
+	assert that path_dirname "" writes "."
+	assert that path_dirname "a" writes "."
+	assert that path_dirname "/a/b/c" writes "/a/b"
+	assert that path_dirname "/a//b///c" writes "/a//b"
+	assert that path_dirname "/a/b/-" writes "/a/b"
+	assert that path_dirname "-" writes "."
+	assert that path_dirname "-/" writes "."
+	assert that path_dirname "/-" writes "/"
+	assert that path_dirname "b/-" writes "b"
+	assert that path_dirname "/b/-" writes "/b"
+	assert that path_dirname "b/--" writes "b"
+	assert that path_dirname "/b/--" writes "/b"
+	assert that path_dirname "b/--/a" writes "b/--"
+	assert that path_dirname "b/--//a" writes "b/--"
+	assert that path_dirname "a///b///" writes "a"
+	assert that path_dirname "///a///b///" writes "///a"
+}
+
+test_dirname_returns_slash_if_path_consists_only_of_slashes() {
+	assert that path_dirname "/" writes "/"
+	assert that path_dirname "//" writes "/"
+	assert that path_dirname "///" writes "/"
+	assert that path_dirname "////" writes "/"
+	assert that path_dirname "/////" writes "/"
+}
+
+test_dirname_ignores_trailing_slashes() {
+	assert that path_dirname "/a/b/c/" writes "/a/b"
+	assert that path_dirname "/a/b//c/" writes "/a/b"
+	assert that path_dirname "/a/b///c/" writes "/a/b"
+	assert that path_dirname "/a/b////c/" writes "/a/b"
+}
+
+test_dirname_accepts_multiple_arguments() {
+	IFS=:
+	assert that path_dirname "/a/b/c" "d" "e/f/g/" "/" "" "|" writes "/a/b:.:e/f:/:.:."
+}
+
+test_dirname_timing() {
+	loop() {
+		for (( i=0; i < 500; ++i )); do
+			$* >/dev/null
+		done
+	}
+	run_race() {
+		{
+			{ time loop path_dirname "/a/b////c/" ; } 2>&1 | sed -n '/real/ s/$/ 1/p'
+			{ time loop dirname "/a/b////c/" ; } 2>&1 | sed -n '/real/ s/$/ 2/p'
+		} | sort | head -n 1 | sed -r 's/.*(.)$/\1/'
+	}
+	assert that run_race writes 1
+}
+
 testcase_end "$@"
