@@ -33,4 +33,39 @@ testx_dontRunMe() {
 	false
 }
 
+teststage_proceed
+testsRun=$_test_runCount
+test_testdata_is_passed_to_test_function() {
+    if (( $# != 2 )); then
+        echo "wrong parameter count: $#"
+        false
+    fi
+    case "$1:$2" in
+        1:a|2:b) ;;
+        *)
+            echo "bad test data: $1:$2"
+            return 1
+        ;;
+    esac
+}
+test_z_test_function_is_called_once_for_each_line_in_test_data() {
+	if (( _test_runCount - testsRun != 3 )); then
+		echo 3 != "$(( _test_runCount - testsRun ))"
+		return 1
+	fi
+}
+testdata "testdata_is_passed_to_test_function" <<-EOF
+	1 a
+	2 b
+EOF
+
+teststage_proceed
+test_testdata_fails_fast_if_data_can_not_be_parsed() {
+	! (
+		testdata "it's broken" <<-EOF
+			1 ; 2
+		EOF
+	)
+}
+
 testcase_end "$@"

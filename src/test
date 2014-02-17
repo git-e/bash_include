@@ -7,6 +7,7 @@ SCRIPT_DESCRIPTION="simple bash test framwork"
 SCRIPT_PACKAGE="bash_include"
 SCRIPT_API="0"
 
+
 testcase_begin() {
 	local IFS=$'\n'
 	_test_unsetTestFunctions
@@ -18,6 +19,22 @@ testcase_end() {
 	(( ! _test_failedCount ))
 }
 
+testdata() {
+	_test_data[$1]="$(</dev/stdin)"
+	_test_exit_on_error "$( eval _test_dataset=( "${_test_data[$1]}" ) 2>&1 )"
+}
+
+_test_exit_on_error() {
+	(( $? == 0 )) && return
+	for (( i = ${#BASH_SOURCE[@]} - 1; i > 0; --i )); do
+		printf '%s\n\t' "${BASH_SOURCE[i]}:${BASH_LINENO[i-1]}"
+	done
+	printf '%s\n' "${1//
+/
+	}"
+	exit 1
+} 2>&1
+
 _test_unsetTestFunctions() {
 	local IFS=$'\n'
 	for line in $(declare -p -F); do
@@ -25,6 +42,8 @@ _test_unsetTestFunctions() {
 		test "test_" == "${function::5}" || continue
 		unset -f $function
 	done
+	unset _test_data
+	declare -gA _test_data
 }
 
 _test_resetTestCaseVariables() {
@@ -43,18 +62,22 @@ _test_resetTestCaseVariables() {
 }
 
 _test_runTestFunctions() {
-	local _test_IFS="$IFS"
+	local _test_IFS="$IFS" _test_dataset _test_dataline
 	local IFS=$'\n'
 	for line in $(declare -p -F); do
 		local function="${line#declare -f }"
 		test "test_" == "${function::5}" || continue
-		(( ++_test_runCount ))
-		if (( _test_stageFailed )); then
-			(( ++_test_skippedCount ))
-			printf '%s %s.\n' "${function:5}" "${_test_SKIPPED}"
-		else
-			IFS="$_test_IFS" _test_runTest $function
-		fi
+		while read -r _test_dataline; do
+			IFS=$'\t\n '
+			eval _test_dataset=( $_test_dataline )
+			(( ++_test_runCount ))
+			if (( _test_stageFailed )); then
+				(( ++_test_skippedCount ))
+				printf '%s %s.\n' "${function:5}" "${_test_SKIPPED}"
+			else
+				IFS="$_test_IFS" _test_runTest "$function" "${_test_dataset[@]}"
+			fi
+		done <<< "${_test_data[${function:5}]}"
 	done
 	_test_stageFailed=${_test_failedCount}
 }
@@ -68,7 +91,7 @@ _test_runTest() {
 	else
 		_test_status="${_test_FAILED}"
 	fi
-	printf '%s %s' "${1#test_}" "${_test_status}"
+	IFS=' ' printf '%s %s' "${1#test_}${2:+(${*:2})}" "${_test_status}"
 	if [ -n "${_test_output}" ]; then
 		printf ':\n%s\n' "$(sed 's/^/> /' <<EOF
 ${_test_output}
