@@ -66,6 +66,13 @@ var_init()
 	fi
 }
 
+var_script() {
+set -x
+	set -- "${@/#/#}"
+	set -- "${@/##@{/@{#}"
+	var "${@/\#/${SCRIPT_PREFIX}_}"
+}
+
 var_script_init() {
 	var_init "${SCRIPT_PREFIX}_$@"
 }

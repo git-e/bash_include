@@ -167,4 +167,14 @@ test_var_script_init_prefixes_variable_name() {
 	assert that script_var contains content
 }
 
+test_var_script_prefixes_variable_name() {
+	SCRIPT_PREFIX=script
+	var_script var1=content1 var2=content2 @{var3-content3}
+	assert that var1 contains ''
+	assert that var2 contains ''
+	assert that script_var1 contains content1
+	assert that script_var2 contains content2
+	assert that script_var3 contains content3
+}
+
 testcase_end "$@"
