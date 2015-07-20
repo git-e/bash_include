@@ -9,7 +9,8 @@ dist_libentry_SCRIPTS+=\
 	src/path \
 	src/regex \
 	src/script-template \
-	src/var
+	src/var \
+	src/test
 
 dist_entry_DATA+=src/bash_include
 dist_entry_DATA_IN+=src/bash_include.in
