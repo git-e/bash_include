@@ -1,8 +1,17 @@
 #!/bin/bash
 #
 
-for testcase in include test assert testcase err var msg opt path; do
-	"./test-$testcase.sh" || exit
+cd "$(dirname "$0")"
+failed=()
+for testcase in include test assert testcase err var math msg opt path; do
+	"./test-$testcase.sh" || failed+=("$testcase")
+	echo
 done
 
-printf '\n* all test passed *\n'
+if (( ${#failed[@]} )); then
+	printf 'failed testcases: %s\n' "${failed[*]}"
+	exit 1
+else
+	printf 'all testcases passed.\n'
+	exit 0
+fi
