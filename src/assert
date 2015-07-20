@@ -81,25 +81,25 @@ _assert_returns() {
 }
 
 assertEquals() {
-	local _test_assertion="${_test_assertion:-equality assertion failed}"
-	test "|$1" == "|$2" || _test_printfAndFail '%s: expected: [%s] got: [%s]\n' "$_test_assertion" "$1" "$2"
+	local _assert_assertion="${_assert_assertion:-equality assertion failed}"
+	test "|$1" == "|$2" || _assert_printfAndFail '%s: expected: [%s] got: [%s]\n' "$_assert_assertion" "$1" "$2"
 }
 
 assertLastCommandFailed() {
-	test $? == 0 && _test_printfAndFail 'assertion failed: last command unexpectly succeded\n'
+	test $? == 0 && _assert_printfAndFail 'assertion failed: last command unexpectly succeded\n'
 	true
 }
 
 assertLastCommandSucceed() {
-	test $? == 0 || _test_printfAndFail 'assertion failed: last command unexpectly failed\n'
+	test $? == 0 || _assert_printfAndFail 'assertion failed: last command unexpectly failed\n'
 }
 
 assertOutput() {
-	local _test_assertion="${_test_assertion:-output assertion failed}"
+	local _assert_assertion="${_assert_assertion:-output assertion failed}"
 	assertEquals "$1" "$(2>/dev/null "${@:2}")"
 }
 
 assertErrorOutput() {
-	local _test_assertion="${_test_assertion:-error output assertion failed}"
+	local _assert_assertion="${_assert_assertion:-error output assertion failed}"
 	assertEquals "$1" "$(2>&1 1>/dev/null "${@:2}")"
 }
