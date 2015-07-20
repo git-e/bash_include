@@ -25,7 +25,7 @@ module_begin "${@}"
 # writes the path to stdout ommiting any trailing slashes
 path_remove_trailing_slash() (
 	shopt -s extglob
-	path="${1-$(cat)}"
+	path="${1-$(</dev/stdin)}"
 
 	var_is_empty path && return
 	path="${path%%*(/)}"
@@ -34,12 +34,9 @@ path_remove_trailing_slash() (
 
 # path_simplyify: prints simplified path to stdout.
 # the path to simplify is passed as first parameter or obtained from stdin.
-path_simplify() (
-	shopt -s extglob
-	path="${1-$(cat)}"
-
-	simplePath=( )
-	IFS='/'
+path_simplify() {
+	local path="${1-$(</dev/stdin)}" simplePath=( ) pathPart
+	local IFS='/'
 	for pathPart in $path; do
 		case "$pathPart" in
 		.) continue ;;
@@ -50,7 +47,7 @@ path_simplify() (
 			*) simplePath=( "${simplePath[@]::${#simplePath[@]}-1}" ) ;;
 			esac
 		;;
-		'') ;; # simplePath=( "${simplePath[@]-}" ) ;;
+		'') ;;
 		*) simplePath+=( "${pathPart}" ) ;;
 		esac
 	done
@@ -62,7 +59,7 @@ path_simplify() (
 	else
 		printf '%s\n' "${simplePath[*]-.}"
 	fi
-)
+}
 
 # path_make_absolute: write an absolute path to stdout.
 # a path is either passed as first parameter or obtained from stdin.
@@ -74,7 +71,7 @@ path_simplify() (
 path_make_absolute() {
 	local path="$2"
 	if path_is_relative "$path"; then
-		path="${1-$(cat)}${path:+"/$path"}"
+		path="${1-$(</dev/stdin)}${path:+"/$path"}"
 		if path_is_relative "$path"; then
 			path="$PWD${path:+"/$path"}"
 		fi
@@ -90,10 +87,9 @@ path_make_absolute() {
 # working directory to the passed path is written to stdout.
 # if any of the paths passed is relative it is interpreted as path starting
 # at the current working directory.
-path_make_relative() (
-	path="$(path_make_absolute ${1+"$1"} | path_simplify)/"
-
-	IFS='/'
+path_make_relative() {
+	local path="$(path_make_absolute ${1+"$1"} | path_simplify)/"
+	local IFS='/'
 	if [ ${2+set} ]; then
 		origin=( $path )
 		destination=( $(path_make_absolute "$2" | path_simplify) )
@@ -114,13 +110,13 @@ path_make_relative() (
 	done
 	
 	printf '%s\n' "${destination[*]:-.}"
-)
+}
 
 # path_is_absolute: returns true if path is absolute
 # a path is either passed as first parameter or obtained from stdin.
 # returns true if the path starts with '/', false otherwise
 path_is_absolute() {
-	local path="${1-$(cat)}"
+	local path="${1-$(</dev/stdin)}"
 	var_not_empty path &&
 		test '/' == "${path::1}"
 }
@@ -129,7 +125,7 @@ path_is_absolute() {
 # a path is either passed as first parameter or obtained from stdin.
 # returns true if the path is empty or does not start with '/', false otherwise
 path_is_relative() {
-	local path="${1-$(cat)}"
+	local path="${1-$(</dev/stdin)}"
 	var_is_empty path ||
 		test '/' != "${path::1}"
 }
@@ -149,6 +145,7 @@ path_basename() {
 	printf '%s\n' "${*#??}"
 }
 
+# path_basename: this is equivalent to basename but avoids forking
 path_dirname() {
 	set -- "${@/#/.}"
 	set -- "${@/#.\//:/}"
