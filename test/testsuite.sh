@@ -3,7 +3,7 @@
 
 cd "$(dirname "$0")"
 failed=()
-for testcase in include test assert testcase err var math msg opt path; do
+for testcase in assert include err math msg opt path str test testcase var; do
 	"./test-$testcase.sh" || failed+=("$testcase")
 	echo
 done

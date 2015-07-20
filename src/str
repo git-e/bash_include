@@ -13,7 +13,7 @@ str_escape() {
 }
 
 str_is_empty() {
-	! test ${1:+set}
+	${1:+false} true
 }
 str_equals() {
 	str_is_empty "${1#"$2"}"
@@ -38,6 +38,7 @@ str_ends_with() {
 str() {
 	local expectedTokens
 	local parametersAfterBadToken
+	local badToken
 	_str "$@"
 	local result=$?
 	if [ ${badToken+set} ]; then
@@ -122,4 +123,3 @@ _str_connector() {
 	;;
 	esac
 }
-
