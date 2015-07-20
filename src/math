@@ -16,27 +16,10 @@ math_max() {
 	echo $_max
 }
 
-math_is_int() (
-	shopt -s extglob
-	string="${1//X/Z}XY"
-	string="${string#[+-]}"
-	string="${string##[123456789]*([0123456789])X}"
-	string="${string##0x+([0123456789ABCDEFabcdef])X}"
-	string="${string##0[1234567]*([01234567])X}"
+math_is_int() {
+	[[ "$1" =~ ^[+-]?("0"[01234567]*|[123456789][01234567890]*|"0x"[01234567890abcdefABCDEF]*)$ ]]
+}
 
-	test 'Y' == "${string}"
-)
-
-math_is_float() (
-	shopt -s extglob
-	string="${1//X/Z}"
-	string="${string%[eE]?([-+])[123456789]*([0123456789])}XY"
-
-	string="${string#[-+]}"
-	string="${string##[123456789]*([0123456789])?(.+([0123456789]))X}"
-	string="${string##[0]?(.+([0123456789]))X}"
-	string="${string##.+([0123456789])X}"
-
-	test 'Y' == "${string}"
-)
-
+math_is_float() {
+	[[ "$1" =~ ^[+-]?(("0"|[123456789][01234567890]*)("."[0123456789]*)?|"."[0123456789]*)([eE][+-]?("0"|[123456789][0123456789]*))?$ ]]
+}

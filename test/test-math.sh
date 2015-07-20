@@ -3,6 +3,72 @@
 include math
 include assert
 
+DECIMAL="\
+1023
+-1023
++1023
++1
+-1
+0
++0
+-0"
+
+HEX="\
+0xA0afFb
+0x0
++0x1
+-0x1"
+
+OCTAL="\
+017
+00
+007
++01
+-01"
+
+FLOATS="\
+.
+.1
+1.
+1.e1
++.1
+-.1
+.001
+0.1
+1.2
+1.0
+12e21
+12e+21
+12e-21
+1.2e21"
+
+NAN="\
+00.0
+a1
+1a
+' 1'
+08
+0xH
+++1
+--1
+.+1
++
+-
+''
+0.1.2
+0..1
+..1
+1e1.2
+1e01
+e1
+e
+''
+0X
+0.1X
+0.1.1X
+0X.0
+9X0x0"
+
 testcase_begin
 test_max_writes_first_parameter_if_only_one_is_passed() {
 	assert that math_max 1 writes 1
@@ -21,59 +87,41 @@ test_max_writes_nothing_if_no_parameter_is_passed() {
 }
 
 teststage_proceed
+testdata is_int_positive_examples <<-EOF
+	$DECIMAL
+	$HEX
+	$OCTAL
+EOF
+
 test_is_int_positive_examples() {
-	examples=(
-		1023 -1023 +1023
-		0xA0afFb
-		017
-	)
-	passed=true
-	for example in "${examples[@]}"; do
-		( assert that math_is_int "$example" returns 0 ) || passed=false
-	done
-	$passed
+	assert math_is_int "$1"
 }
+test_is_int_0() {
+	assert math_is_int 0
+}
+testdata is_int_negative_examples <<-EOF
+	$NAN
+	$FLOATS
+EOF
 test_is_int_negative_examples() {
-	examples=(
-		a1 1a ' 1'
-		08 007
-		0xH
-		++1 --1 + -
-		. '' 9X0x0
-	)
-	passed=true
-	for example in "${examples[@]}"; do
-		( assert that math_is_int "$example" returns 1 ) || passed=false
-	done
-	$passed
+	assert ! math_is_int "$1"
 }
 
 teststage_proceed
+testdata is_float_positive_examples <<-EOF
+	$DECIMAL
+	$FLOATS
+EOF
 test_is_float_positive_examples() {
-	examples=(
-		1023
-		+1 -1 0 +0
-		.1 .001 0.1 1.2 1.0
-		12e21 12e+21 12e-21 1.2e21
-	)
-	passed=true
-	for example in "${examples[@]}"; do
-		( assert that math_is_float "$example" returns 0 ) || passed=false
-	done
-	$passed
+	assert math_is_float "$1"
 }
+testdata is_float_negative_examples <<-EOF
+	$NAN
+	$HEX
+	$OCTAL
+EOF
 test_is_float_negative_examples() {
-	examples=(
-		++1 --1 .+1 + -
-		0.1.2 0..1 ..1 1.
-		1e1.2 1e01 e1 e
-		. '' 0X 0.1X 0.1.1X 0X.0
-	)
-	passed=true
-	for example in "${examples[@]}"; do
-		( assert that math_is_float "$example" returns 1 ) || passed=false
-	done
-	$passed
+	assert ! math_is_float "$1"
 }
 
 testcase_end
