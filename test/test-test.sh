@@ -34,7 +34,11 @@ testx_dontRunMe() {
 }
 
 teststage_proceed
-testsRun=$_test_runCount
+testdata "testdata_is_passed_to_test_function" <<-EOF
+	1 "a"
+	2 "b"
+EOF
+
 test_testdata_is_passed_to_test_function() {
     if (( $# != 2 )); then
         echo "wrong parameter count: $#"
@@ -48,16 +52,20 @@ test_testdata_is_passed_to_test_function() {
         ;;
     esac
 }
-test_z_test_function_is_called_once_for_each_line_in_test_data() {
-	if (( _test_runCount - testsRun != 3 )); then
-		echo 3 != "$(( _test_runCount - testsRun ))"
+
+test_function_is_called_once_for_each_line_in_test_data() {
+	testcase_begin
+	testdata "with_testdata" <<<$'1\n2\n3'
+	test_with_testdata() {
+		:
+	}
+	testcase_end
+
+	if (( _test_runCount != 3 )); then
+		echo 3 != "$_test_runCount"
 		return 1
 	fi
 }
-testdata "testdata_is_passed_to_test_function" <<-EOF
-	1 "a"
-	2 "b"
-EOF
 
 teststage_proceed
 test_testdata_fails_fast_if_data_can_not_be_parsed() {

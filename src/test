@@ -7,7 +7,6 @@ SCRIPT_DESCRIPTION="simple bash test framwork"
 SCRIPT_PACKAGE="bash_include"
 SCRIPT_API="0"
 
-
 testcase_begin() {
 	local IFS=$'\n'
 	_test_resetTestCaseVariables
@@ -44,10 +43,6 @@ _test_setupTestStage() {
 	done
 	unset _test_data
 	declare -gA _test_data
-	# this function is called before each test, overwrite to implement setup
-	teststage_setup() {
-		:
-	}
 }
 
 _test_resetTestCaseVariables() {
@@ -96,10 +91,7 @@ _test_runTest() {
 	fi
 	IFS=' ' printf '%s %s' "${2#test_}${1:+($1)}" "${_test_status}"
 	if [ -n "${_test_output}" ]; then
-		printf ':\n%s\n' "$(sed 's/^/> /' <<EOF
-${_test_output}
-EOF
-)"
+		(IFS=$'\n'; printf ':\n'; printf '> %s\n' ${_test_output})
 	else
 		printf ".\n"
 	fi
@@ -116,6 +108,11 @@ EOF
 teststage_proceed() {
 	_test_runTestFunctions
 	_test_setupTestStage
+}
+
+# this function is called before each test, overwrite to implement setup
+teststage_setup() {
+	:
 }
 
 _test_printfAndFail() {
