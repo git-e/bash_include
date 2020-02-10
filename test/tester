@@ -18,7 +18,7 @@ include test
 
 source "$@"
 printf '========\n'
-printf 'summary: %s run, %s passed, %s failed\n' "$_test_runCount" "$_test_passedCount" "$_test_failedCount"
+printf 'summary: %s total, %s passed, %s failed, %s skipped\n' "$_test_runCount" "$_test_passedCount" "$_test_failedCount" "$_test_skippedCount"
 if (( $_test_failedCount )); then
 	_test_status="${_test_FAILED}"
 else
