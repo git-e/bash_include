@@ -60,7 +60,7 @@ test_var_print_escapes_correctly() {
 	needs_escaping='"$
 \'
 	assert that var_print needs_escaping writes 'needs_escaping="\"\$
-\\"'
+\\"' #"
 }
 
 teststage_proceed
