@@ -29,7 +29,7 @@
 # Bash enhancement for repeative complex scripts
 # this script has to be sourced in to get the feature
 # of 'include'
-# include 'basic' will load the script 'basic' from @libentrydir@
+# include 'basic' will load the script 'basic' from BASH_INCLUDE_PATH
 
 # dont load if already set
 test ${BASH_INCLUDE+set} &&
@@ -51,7 +51,7 @@ is_included()
 	return 1
 }
  ##
- # Include one or many modules from @libentrydir@
+ # Include one or many modules from BASH_INCLUDE_PATH
  # will exit if the requested module does not exist
 ##
 include()
@@ -79,7 +79,7 @@ try_include()
  # Force Include of a module
  # Will try to include the module and write a error message on failure
  # loads the definitions from the given include module
- # @param filename of module in @libentrydir@
+ # @param filename of module in BASH_INCLUDE_PATH
 ##
 #TODO: rename: load_init_include
 force_include()

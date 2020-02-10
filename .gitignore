@@ -11,4 +11,3 @@ config.status
 config.transform
 configure
 etc/env.d/05bash_include
-src/bash_include
