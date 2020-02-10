@@ -39,13 +39,14 @@ str_ends_with() {
 
 str() {
 	local expectedTokens
+	local badToken
 	local parametersAfterBadToken
 	local badToken
 	_str "$@"
 	local result=$?
 	if [ ${badToken+set} ]; then
-		printf "str: unexpected token: here: str %s " "${*:1:$#-${#parametersAfterBadToken}-1}"
-		printf ">>%s<<" "${*:$#-${#parametersAfterBadToken}:1}"
+		printf "str: unexpected token: here: str %s " "${*:1:$#-${#parametersAfterBadToken[@]}-1}"
+		printf ">>%s<<" "${badToken}"
 		if [ ${expectedTokens[@]+set} ]; then
 			printf ', expected:'
 			printf ' `%s'\' "${expectedTokens[@]}"
@@ -65,6 +66,7 @@ _str() {
 		*)
 			badToken="$2"
 			parametersAfterBadToken=( "${@:3}" )
+			expectedTokens=( is begins ends contains equals matches )
 			return 1
 		;;
 		esac

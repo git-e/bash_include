@@ -90,5 +90,6 @@ test_str_syntax_errors() {
 	assert ! str ab is not empty c
 	assert ! str ab begins a
 	assert ! str ab begins not b
+	assert ! str hello not equals hallo
 }
 testcase_end
