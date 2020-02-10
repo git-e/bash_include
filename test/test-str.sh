@@ -38,6 +38,22 @@ test_str_contains_returns_true_for_star() {
 	assert str_contains a '*'
 }
 
+teststage_proceed
+test_empty_string_equals_not_nonempty_string() {
+	assert not str '' equals '|'
+	assert not str '' matches '|'
+	assert not str '' contains '|'
+	assert not str '|' equals ''
+	assert not str '|' matches ''
+}
+
+test_empty_string_equals_not_empty_string() {
+	assert str '' equals ''
+	assert str '' contains ''
+	assert str '' matches ''
+}
+
+teststage_proceed
 test_str_begins_with() {
 	assert str_begins_with "ab" "a"
 	assert ! str_begins_with "ab" "b"

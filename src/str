@@ -16,15 +16,17 @@ str_is_empty() {
 	${1:+false} true
 }
 str_equals() {
+	set -- "|$1" "|$2"
 	str_is_empty "${1#"$2"}"
 }
 
 str_matches() {
-	str_is_empty "${1//$2}"
+	set -- "|$1" "|$2"
+	str_is_empty "${1/#$2}"
 }
 
 str_contains() {
-	str_is_empty "${1//*$2*}"
+	str_matches "$1" "*$2*"
 }
 
 str_begins_with() {
