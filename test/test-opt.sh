@@ -1,4 +1,4 @@
-#!./tester
+#!/usr/bin/env ./tester
 #
 SCRIPT_NAME="test-opt"
 SCRIPT_PREFIX=""

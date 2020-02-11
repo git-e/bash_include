@@ -1,4 +1,4 @@
-#!./tester
+#!/usr/bin/env ./tester
 #
 include assert
 
@@ -17,7 +17,7 @@ test_assert_exits_with_failure_for_false() {
 
 teststage_proceed
 test_assert_defines_that() {
-	assert that
+	assert that true returns 0
 }
 
 test_assert_defines_that_local() {

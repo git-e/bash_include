@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 SRCDIR="${PWD}/../src"
 BASH_INCLUDE_PATH="${SRCDIR}"

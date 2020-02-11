@@ -1,4 +1,4 @@
-#!./tester
+#!/usr/bin/env ./tester
 #
 testcase_begin "$@"
 test_runTest() {

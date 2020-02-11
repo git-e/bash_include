@@ -37,7 +37,7 @@ _test_exit_on_error() {
 _test_setupTestStage() {
 	local IFS=$'\n'
 	for line in $(declare -p -F); do
-		local function="${line#declare -f }"
+		local function="${line#declare -f }" #"
 		test "test_" == "${function::5}" || continue
 		unset -f $function
 	done

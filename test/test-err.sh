@@ -1,4 +1,4 @@
-#!./tester
+#!/usr/bin/env ./tester
 #
 include err
 include assert

@@ -1,4 +1,4 @@
-#!./tester
+#!/usr/bin/env ./tester
 #
 include str
 include assert
@@ -40,11 +40,11 @@ test_str_contains_returns_true_for_star() {
 
 teststage_proceed
 test_empty_string_equals_not_nonempty_string() {
-	assert not str '' equals '|'
-	assert not str '' matches '|'
-	assert not str '' contains '|'
-	assert not str '|' equals ''
-	assert not str '|' matches ''
+	assert ! str '' equals '|'
+	assert ! str '' matches '|'
+	assert ! str '' contains '|'
+	assert ! str '|' equals ''
+	assert ! str '|' matches ''
 }
 
 test_empty_string_equals_not_empty_string() {

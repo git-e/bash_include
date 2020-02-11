@@ -1,4 +1,4 @@
-#!./tester
+#!/usr/bin/env ./tester
 #
 include str
 include path
@@ -247,7 +247,7 @@ test_basename_timing() {
 		{
 			{ time loop path_basename "/a/b////c/" ; } 2>&1 | sed -n '/real/ s/$/ 1/p'
 			{ time loop basename "/a/b////c/" ; } 2>&1 | sed -n '/real/ s/$/ 2/p'
-		} | sort | head -n 1 | sed -r 's/.*(.)$/\1/'
+		} | sort | head -n 1 | sed 's/.*\(.\)$/\1/'
 	}
 	assert that run_race writes 1
 }
@@ -302,7 +302,7 @@ test_dirname_timing() {
 		{
 			{ time loop path_dirname "/a/b////c/" ; } 2>&1 | sed -n '/real/ s/$/ 1/p'
 			{ time loop dirname "/a/b////c/" ; } 2>&1 | sed -n '/real/ s/$/ 2/p'
-		} | sort | head -n 1 | sed -r 's/.*(.)$/\1/'
+		} | sort | head -n 1 | sed 's/.*\(.\)$/\1/'
 	}
 	assert that run_race writes 1
 }

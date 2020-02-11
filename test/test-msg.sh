@@ -1,4 +1,4 @@
-#!./tester
+#!/usr/bin/env ./tester
 #
 include msg
 include str
@@ -80,7 +80,7 @@ teststage_proceed
 test_msg_error_stacktrace() {
 	message="$(msg_error_stacktrace "message" 123  2>&1 1>/dev/null)"
 	assert str "$message" ends with "\
-	./test-msg.sh:$((LINENO - 1))
+	${BASH_SOURCE[0]}:$((LINENO - 1))
 	program: message"
 }
 
